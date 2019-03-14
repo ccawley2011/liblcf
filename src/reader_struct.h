@@ -370,7 +370,8 @@ struct TypedField : public Field<S> {
 template <typename S, typename T>
 struct DatabaseVersionField : public TypedField<S,T> {
 
-	using TypedField<S,T>::TypedField;
+	DatabaseVersionField(T S::*ref, int id, const char* name, bool present_if_default, bool is2k3) :
+		TypedField<S,T>(ref, id, name, present_if_default, is2k3) {}
 
 	int LcfSize(const S& obj, LcfWriter& stream) const {
 		//If db version is 0, it's like a "version block" is not present.
@@ -396,7 +397,8 @@ struct DatabaseVersionField : public TypedField<S,T> {
 template <typename S>
 struct EmptyField : public Field<S> {
 
-	using Field<S>::Field;
+	EmptyField(int id, const char* name, bool present_if_default, bool is2k3) :
+		Field<S>(id, name, present_if_default, is2k3) {}
 
 	void ReadLcf(S& /* obj */, LcfReader& /* stream */, uint32_t /* length */) const { }
 	void WriteLcf(const S& /* obj */, LcfWriter& /* stream */) const { }
@@ -459,7 +461,8 @@ struct SizeField : public Field<S> {
 template <class S, class T>
 struct CountField : public SizeField<S,T> {
 
-	using SizeField<S,T>::SizeField;
+	CountField(const std::vector<T> S::*ref, int id, bool present_if_default, bool is2k3) :
+		SizeField<S,T>(ref, id, present_if_default, is2k3) {}
 
 	void WriteLcf(const S& obj, LcfWriter& stream) const {
 		int size = (obj.*(this->ref)).size();
